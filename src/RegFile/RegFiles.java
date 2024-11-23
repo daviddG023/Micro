@@ -36,4 +36,7 @@ public class RegFiles {
             System.out.println(register);
         }
     }
+    public int size() {
+    	return registers.size();
+    }
 }

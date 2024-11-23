@@ -3,6 +3,8 @@ package LoadBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import executionTable.ExecutionEntry;
+
 public class LoadBuffers {
     private List<LoadBuffer> loadBuffers; // List to hold all the LoadBuffer objects
 
@@ -28,6 +30,12 @@ public class LoadBuffers {
         for (LoadBuffer buffer : loadBuffers) {
             buffer.reset();
         }
+    }
+    public LoadBuffer get(int i) {
+    	return loadBuffers.get(i);
+    }
+    public int size() {
+    	return loadBuffers.size();
     }
 
     // Print all load buffers

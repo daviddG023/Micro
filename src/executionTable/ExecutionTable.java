@@ -10,6 +10,9 @@ public class ExecutionTable {
     public ExecutionTable() {
         this.table = new ArrayList<>();
     }
+    public ExecutionEntry getTable(int i){
+    	return table.get(i);
+    }
 
     // Add a new entry to the table
     public void addEntry(ExecutionEntry entry) {
@@ -39,7 +42,12 @@ public class ExecutionTable {
     public void setWriteBack(int index, int writeBackCycle) {
         table.get(index).setWriteBack(writeBackCycle);
     }
-
+    public ExecutionEntry get(int i) {
+    	return table.get(i);
+    }
+    public int size() {
+    	return table.size();
+    }
     // Print the table in a tabular format
     public void printTable() {
         System.out.printf("%-15s %-10s %-20s %-10s\n", "Instruction", "Issue", "Execution (Start-End)", "WriteBack");

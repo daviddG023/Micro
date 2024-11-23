@@ -3,6 +3,8 @@ package reservation_tables;
 import java.util.ArrayList;
 import java.util.List;
 
+import LoadBuffer.LoadBuffer;
+
 public class ReservationStations {
     private List<ReservationStation> stations; // List to hold all reservation stations
 
@@ -36,11 +38,17 @@ public class ReservationStations {
             System.out.println(station);
         }
     }
+    public ReservationStation get(int i) {
+    	return stations.get(i);
+    }
+    public int size() {
+    	return stations.size();
+    }
 
     // Update a specific reservation station with setAll
-    public void setStation(int index, boolean busy, String op, String vj, String vk, String qj, String qk, String a) {
+    public void setStation(int index, boolean busy, String op, String vj, String vk, String qj, String qk, String a,Integer Time) {
         if (index >= 0 && index < stations.size()) {
-            stations.get(index).setAll(busy, op, vj, vk, qj, qk, a);
+            stations.get(index).setAll(busy, op, vj, vk, qj, qk, a,Time);
         } else {
             throw new IndexOutOfBoundsException("Invalid station index: " + index);
         }

@@ -12,6 +12,7 @@ public class ReservationStation {
     private String qj;    // Tag of the first operand source (reservation station or register)
     private String qk;    // Tag of the second operand source (reservation station or register)
     private String a;     // Address or immediate value
+    private Integer Time;
 
     // Constructor
     public ReservationStation(String name) {
@@ -23,6 +24,7 @@ public class ReservationStation {
         this.qj = null;
         this.qk = null;
         this.a = null;
+        this.Time = null;
     }
 
     // Getters and setters for all fields
@@ -95,6 +97,7 @@ public class ReservationStation {
         this.qj = null;
         this.qk = null;
         this.a = null;
+        this.Time=null;
     }
 
     // Get all fields as a Map
@@ -108,11 +111,12 @@ public class ReservationStation {
         fields.put("qj", qj);
         fields.put("qk", qk);
         fields.put("a", a);
+        fields.put("Time",Time);
         return fields;
     }
 
     // Set all fields at once
-    public void setAll(boolean busy, String op, String vj, String vk, String qj, String qk, String a) {
+    public void setAll(boolean busy, String op, String vj, String vk, String qj, String qk, String a,Integer Time) {
         this.busy = busy;
         this.op = op;
         this.vj = vj;
@@ -120,12 +124,13 @@ public class ReservationStation {
         this.qj = qj;
         this.qk = qk;
         this.a = a;
+        this.Time = Time;
     }
 
     @Override
     public String toString() {
-        return "ReservationStation{" +
-               "name='" + name + '\'' +
+        return "ReservationStation{" +"Time='" + Time + '\''+    		
+               " name='" + name + '\'' +
                ", busy=" + busy +
                ", op='" + op + '\'' +
                ", vj='" + vj + '\'' +
