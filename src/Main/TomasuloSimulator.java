@@ -17,6 +17,7 @@ public class TomasuloSimulator {
     
     // Run the Tomasulo simulation loop
     public void run() {
+    	int i =1;
         while (!isSimulationComplete()) {
             System.out.println("Clock Cycle: " + clockCycle);
 
@@ -24,16 +25,18 @@ public class TomasuloSimulator {
             if (clockCycle == 1) {
                 components.table.setIssue(0, clockCycle);
                 Instruction instruction = components.table.getTable(0).getInstruction();
-                components.updateReservationStation(instruction.operation, 0, true, instruction.operation, instruction.source1, instruction.source2, null, null, instruction.destination, null);
-                components.updateRegister(Integer.parseInt(instruction.destination.substring(1))-1,"M1");
+                components.updateReservationStation(instruction.operation,  true, instruction.operation, instruction.source1, instruction.source2, null, null, instruction.destination, null);
+//                components.updateRegister(Integer.parseInt(instruction.destination.substring(1))-1,"M1");
                
-            } else if (clockCycle == 2) {
-            	components.table.setIssue(1, clockCycle);
-            	Instruction instruction = components.table.getTable(1).getInstruction();
-                components.updateReservationStation(instruction.operation, 0, true, instruction.operation, instruction.source1, instruction.source2, instruction.source1, instruction.source2, instruction.destination, null);
+            } else if (i< 3) {
+            	components.table.setIssue(i, clockCycle);
+            	Instruction instruction = components.table.getTable(i).getInstruction();
+                components.updateReservationStation(instruction.operation,  true, instruction.operation, instruction.source1, instruction.source2, instruction.source1, instruction.source2, instruction.destination, null);
                 components.subtractCycle(clockCycle);
-                components.updateRegister(Integer.parseInt(instruction.destination.substring(1))-1,"A1");
-            }else {
+//                components.updateRegister(Integer.parseInt(instruction.destination.substring(1))-1,"A1");
+                i++;
+            }
+            else {
             	components.subtractCycle(clockCycle);
             }
 
@@ -50,7 +53,7 @@ public class TomasuloSimulator {
     // Check if the simulation is complete
     private boolean isSimulationComplete() {
         // Example condition: Stop after 10 clock cycles
-        return clockCycle >= 5;
+        return clockCycle >=10;
     }
     public static void main(String[] args) {
     	mainCode program = new mainCode(

@@ -87,7 +87,9 @@ public class ReservationStation {
     public void setA(String a) {
         this.a = a;
     }
-
+    public boolean getBusy() {
+        return busy;
+    }
     // Reset all fields
     public void reset() {
         this.busy = false;

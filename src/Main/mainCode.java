@@ -77,10 +77,14 @@ public class mainCode {
     }
 
     // Method to update a Reservation Station
-    public void updateReservationStation(String type, int stationIndex, boolean busy, String op, String vj, String vk, String qj, String qk, String a, Integer Time) {
+    public void updateReservationStation(String type, boolean busy, String op, String vj, String vk, String qj, String qk, String a, Integer Time) {
     // Determine the type of Reservation Station (ADD or MUL)
     ReservationStations stations = type.equals("ADD") ? addStations : mulStations;
-    Integer cycleCount = type.equals("ADD") ? 4 : 2;
+    Integer cycleCount = type.equals("ADD") ? 2 : 2;
+    int stationIndex = stations.getFirstEmpty();
+    String s = type.equals("ADD") ?"A":"M";
+    updateRegister(Integer.parseInt(a.substring(1))-1,s+""+(stationIndex+1));
+
     
     // Validate station index
     if (stationIndex < stations.size()) {
@@ -93,20 +97,20 @@ public class mainCode {
         
         if(qjFound && qkFound) {
         	stations.setStation(stationIndex, busy, op, null, null,regFile.get(Integer.parseInt(qj.substring(1))-1).getQi(), regFile.get(Integer.parseInt(qk.substring(1))-1).getQi(),a, Time);
-        	regFile.add(Integer.parseInt(qj.substring(1))-1,new Point(stationIndex,"qj",vj));
-        	regFile.add(Integer.parseInt(qk.substring(1))-1,new Point(stationIndex,"qk",vk));
+        	regFile.add(Integer.parseInt(qj.substring(1))-1,new Point(stationIndex,"qj",vj,type));
+        	regFile.add(Integer.parseInt(qk.substring(1))-1,new Point(stationIndex,"qk",vk,type));
         	return;
         }
         if (qjFound || qkFound) {
             // Both qj and qk found in RegFiles
         	if(qjFound) {
         		stations.setStation(stationIndex, busy, op, null, vk, regFile.get(Integer.parseInt(qj.substring(1))-1).getQi(), null, a, Time);
-        		regFile.add(Integer.parseInt(qj.substring(1))-1,new Point(stationIndex,"qj",vj));
+        		regFile.add(Integer.parseInt(qj.substring(1))-1,new Point(stationIndex,"qj",vj,type));
 //        		System.out.println(regFile.get((Integer.parseInt(qj.substring(1))-1)).getList());
         	}
         	if(qkFound) {
         		stations.setStation(stationIndex, busy, op, vj, null, null, regFile.get(Integer.parseInt(qk.substring(1))-1).getQi(), a, Time);
-        		regFile.add(Integer.parseInt(qk.substring(1))-1,new Point(stationIndex,"qk",vk));
+        		regFile.add(Integer.parseInt(qk.substring(1))-1,new Point(stationIndex,"qk",vk,type));
 //        		System.out.println(regFile.get((Integer.parseInt(qk.substring(1))-1)).getList());
         	}
         } else {
@@ -154,21 +158,39 @@ public class mainCode {
 
     public void subtractCycle(int clockCycle) {
     // Loop over addStations
-    	
+    	ArrayList<Integer> writeBack = new ArrayList<>();
 	    for (int i = 0; i < addStations.size(); i++) {
 	        ReservationStation station = addStations.get(i);
 	        Integer time = station.getTime();
 	        if (time != null) {
-	        	if(time == 6) {table.setExecutionStart(i, clockCycle);}
+	        	if(time==2&&table.get(i).getIssue()==clockCycle)//change i adjust time
+	        		continue;
+	        	if(time == 2) {//adjust time 
+	        		table.setExecutionStart(i, clockCycle);
+	        	}
 	            // Subtract 1 from time
-	            time = time - 1;
-	            station.setTime(time);
 	            if (time == 0) {
 	            	table.setExecutionEnd(i, clockCycle);
-	            	
+	            	writeBack.add(i);
+	            	List<Point> l= regFile.get(Integer.parseInt(addStations.get(i).getA().substring(1))-1).getList();
+	            	for(Point p:l) {
+	            		ReservationStations stations = p.getOp().equals("ADD") ? addStations : mulStations;
+	            		if(p.getY().equals("qj"))
+	            			stations.setStationJ(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
+	            		if(p.getY().equals("qK"))
+	            			stations.setStationK(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
+	            		if(stations.get(p.getX()).getVj()!=null&&stations.get(p.getX()).getVk()!=null) {
+	                    	stations.setTime(p.getX(), clockCycle);
+	                    }
+	            		
+	            	}
 	            	regFile.resetRow(Integer.parseInt(addStations.getStation(i).getA().substring(1))-1);
 	            	addStations.getStation(i).reset(); // Reset the station before removal (if needed)
-	                // Time has reached zero, perform necessary actions (empty for now)
+	            	// Time has reached zero, perform necessary actions (empty for now)
+	            }
+	            if(time!=0){
+	            	time = time - 1;
+	            	station.setTime(time);
 	            }
 	        }
 	    }
@@ -185,18 +207,24 @@ public class mainCode {
 	            if (time == 0) {
 	            	table.setExecutionEnd(i, clockCycle);
 	            	List<Point> l= regFile.get(Integer.parseInt(mulStations.get(i).getA().substring(1))-1).getList();
+	            	
 	            	for(Point p:l) {
+	            		ReservationStations stations = p.getOp().equals("ADD") ? addStations : mulStations;
 	            		System.out.println(p);
 	            		if(p.getY().equals("qj"))
-	            			addStations.setStationJ(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
+	            			stations.setStationJ(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
 	            		if(p.getY().equals("qK"))
-	            			addStations.setStationK(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
+	            			stations.setStationK(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
 	            	}
 	            	regFile.resetRow(Integer.parseInt(mulStations.getStation(i).getA().substring(1))-1);
 	                mulStations.getStation(i).reset(); // Reset the station before removal (if needed)
 	                // Time has reached zero, perform necessary actions (empty for now)
 	            }
 	        }
+	    }
+	    //writeBack needs to be changed 
+	    for(int write:writeBack) {
+	    	table.setWriteBack(write, clockCycle+1);
 	    }
 }
 
@@ -220,7 +248,7 @@ public class mainCode {
         program.updateRegister(2, "M1"); // Set Qi for R3 to M1
         program.updateLoadBuffer(0, true, "0x200"); // Set L1 buffer to busy and set address
 
-        program.updateReservationStation("A", 0, true, "ADD", "R1", "R2", "Q1", "Q2", null,10); // Update A1
+        program.updateReservationStation("A", true, "ADD", "R1", "R2", "Q1", "Q2", null,10); // Update A1
 
         // Print updated tables
         program.printTables();

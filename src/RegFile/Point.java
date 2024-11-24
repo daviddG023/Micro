@@ -4,13 +4,15 @@ public class Point {
     private int x; // x-coordinate
     private String y; // y-coordinate
     private String z; // y-coordinate
+    private String op;
     
 
     // Constructor
-    public Point(int x, String y,String z) {
+    public Point(int x, String y,String z,String op) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.op = op;
         
     }
 
@@ -42,6 +44,16 @@ public class Point {
     public void setZ(String z) {
         this.z = z;
     }
+ // Getter for z
+    public String getOp() {
+        return op;
+    }
+
+    // Setter for z
+    public void setOp(String op) {
+        this.op = op;
+    }
+ 
  
 
 
@@ -51,6 +63,7 @@ public class Point {
                "x=" + x +
                ", y=" + y +
                ", z=" + z +
+               ", op=" + op +
                '}';
     }
 }

@@ -84,4 +84,10 @@ public class ReservationStations {
 	        }
 		
 	}
+	public int getFirstEmpty() {
+		for(int i=0;i<stations.size();i++) {
+			if(!stations.get(i).getBusy())return i;
+		}
+		return -1;
+	}
 }

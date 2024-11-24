@@ -13,6 +13,12 @@ public class ExecutionTable {
     public ExecutionEntry getTable(int i){
     	return table.get(i);
     }
+    public boolean getReady(int i) {
+    	return table.get(i).getReady();
+    }
+    public void setReady(int i,boolean b) {
+    	table.get(i).setReady(b);
+    }
 
     // Add a new entry to the table
     public void addEntry(ExecutionEntry entry) {
@@ -62,4 +68,8 @@ public class ExecutionTable {
                     entry.getWriteBack() != null ? entry.getWriteBack() : "null");
         }
     }
+	public Integer getExecutionStart(int i) {
+
+		return table.get(i).getIssue();
+	}
 }

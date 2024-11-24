@@ -6,6 +6,7 @@ public class ExecutionEntry {
     private Integer issue;           // Issue cycle (nullable)
     private Cycle execution;         // Execution start and end cycles (nullable)
     private Integer writeBack;       // Write-back cycle (nullable)
+    private boolean ready;
 
     // Nested class for Execution Cycle (start and end)
     public static class Cycle {
@@ -53,6 +54,7 @@ public class ExecutionEntry {
         this.issue = null; // Initially null
         this.execution = new Cycle(); // Execution cycle starts as null
         this.writeBack = null; // Initially null
+        this.ready = true;
     }
 
     // Getters and setters
@@ -90,6 +92,14 @@ public class ExecutionEntry {
 
     public void setWriteBack(Integer writeBack) {
         this.writeBack = writeBack;
+    }
+    
+    public boolean getReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 
     @Override
