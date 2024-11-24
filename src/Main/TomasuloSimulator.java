@@ -24,17 +24,17 @@ public class TomasuloSimulator {
             if (clockCycle == 1) {
                 components.table.setIssue(0, clockCycle);
                 Instruction instruction = components.table.getTable(0).getInstruction();
-                components.updateReservationStation(instruction.operation, 0, true, instruction.operation, instruction.source1, instruction.source2, null, null, null, 5);
+                components.updateReservationStation(instruction.operation, 0, true, instruction.operation, instruction.source1, instruction.source2, null, null, instruction.destination, null);
                 components.updateRegister(Integer.parseInt(instruction.destination.substring(1))-1,"M1");
                
             } else if (clockCycle == 2) {
-            	components.table.setExecutionStart(0, clockCycle);
             	components.table.setIssue(1, clockCycle);
             	Instruction instruction = components.table.getTable(1).getInstruction();
-                components.updateReservationStation(instruction.operation, 0, true, instruction.operation, instruction.source1, instruction.source2, instruction.source1, instruction.source2, null, 7);
+                components.updateReservationStation(instruction.operation, 0, true, instruction.operation, instruction.source1, instruction.source2, instruction.source1, instruction.source2, instruction.destination, null);
+                components.subtractCycle(clockCycle);
                 components.updateRegister(Integer.parseInt(instruction.destination.substring(1))-1,"A1");
             }else {
-            	
+            	components.subtractCycle(clockCycle);
             }
 
             
@@ -44,13 +44,6 @@ public class TomasuloSimulator {
 
             // Print the state of all components
             components.printTables(); 
-
-            // Simulate a delay between cycles (optional)
-            try {
-                Thread.sleep(1000); // 1-second delay for demonstration
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
     }
 

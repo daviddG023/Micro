@@ -26,7 +26,7 @@ public class RegFiles {
     // Reset Qi of all registers
     public void resetAllQi() {
         for (RegFile register : registers) {
-            register.setQi();
+            register.resetRow();
         }
     }
 
@@ -39,4 +39,16 @@ public class RegFiles {
     public int size() {
     	return registers.size();
     }
+
+	public void resetRow(int i) {
+		registers.get(i).resetRow();
+		
+	}
+	public RegFile get(int i) {
+		return registers.get(i);
+	}
+	public void add(int i,Point p) {
+		registers.get(i).add(p);
+	}
+	
 }

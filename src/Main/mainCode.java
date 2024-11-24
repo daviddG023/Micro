@@ -1,8 +1,9 @@
 package Main;
 
+import RegFile.Point;
 import RegFile.RegFiles;
 import LoadBuffer.LoadBuffers;
-import reservation_tables.ReservationStations;
+import reservation_tables.*;
 import reader.*;
 import executionTable.*;
 import java.util.ArrayList;
@@ -79,23 +80,40 @@ public class mainCode {
     public void updateReservationStation(String type, int stationIndex, boolean busy, String op, String vj, String vk, String qj, String qk, String a, Integer Time) {
     // Determine the type of Reservation Station (ADD or MUL)
     ReservationStations stations = type.equals("ADD") ? addStations : mulStations;
-
+    Integer cycleCount = type.equals("ADD") ? 4 : 2;
+    
     // Validate station index
     if (stationIndex < stations.size()) {
         // Check qj in RegFiles
+    	System.out.println("this is the qj and the qk"+qj+qk);
         boolean qjFound = qj != null && checkRegisterExists(qj);
 
         // Check qk in RegFiles
         boolean qkFound = qk != null && checkRegisterExists(qk);
-
+        
+        if(qjFound && qkFound) {
+        	stations.setStation(stationIndex, busy, op, null, null,regFile.get(Integer.parseInt(qj.substring(1))-1).getQi(), regFile.get(Integer.parseInt(qk.substring(1))-1).getQi(),a, Time);
+        	regFile.add(Integer.parseInt(qj.substring(1))-1,new Point(stationIndex,"qj",vj));
+        	regFile.add(Integer.parseInt(qk.substring(1))-1,new Point(stationIndex,"qk",vk));
+        	return;
+        }
         if (qjFound || qkFound) {
             // Both qj and qk found in RegFiles
-        	if(qjFound)
-        		stations.setStation(stationIndex, busy, op, null, vk, qj, null, a, Time);
-        	if(qkFound)
-        		stations.setStation(stationIndex, busy, op, vj, null, null, qk, a, Time);
+        	if(qjFound) {
+        		stations.setStation(stationIndex, busy, op, null, vk, regFile.get(Integer.parseInt(qj.substring(1))-1).getQi(), null, a, Time);
+        		regFile.add(Integer.parseInt(qj.substring(1))-1,new Point(stationIndex,"qj",vj));
+//        		System.out.println(regFile.get((Integer.parseInt(qj.substring(1))-1)).getList());
+        	}
+        	if(qkFound) {
+        		stations.setStation(stationIndex, busy, op, vj, null, null, regFile.get(Integer.parseInt(qk.substring(1))-1).getQi(), a, Time);
+        		regFile.add(Integer.parseInt(qk.substring(1))-1,new Point(stationIndex,"qk",vk));
+//        		System.out.println(regFile.get((Integer.parseInt(qk.substring(1))-1)).getList());
+        	}
         } else {
         	stations.setStation(stationIndex, busy, op, vj, vk, qj, qk, a, Time);
+        }
+        if(stations.get(stationIndex).getVj()!=null&&stations.get(stationIndex).getVk()!=null) {
+        	stations.setTime(stationIndex, cycleCount);
         }
     } else {
         System.out.println("Invalid Reservation Station index: " + stationIndex);
@@ -107,7 +125,7 @@ public class mainCode {
             int registerIndex = Integer.parseInt(register.substring(1)) - 1;
 
             // Validate the register index is within bounds of RegFiles
-            return registerIndex >= 0 && registerIndex < regFile.size();
+            return registerIndex >= 0 && registerIndex < regFile.size()&&regFile.get(registerIndex).getQi()!=null;
         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
             // Handle invalid register format (e.g., "R" with no number or non-numeric input)
             System.out.println("Invalid register format: " + register);
@@ -133,6 +151,56 @@ public class mainCode {
         System.out.println("\nMultiply Reservation Stations:");
         mulStations.printAllStations();
     }
+
+    public void subtractCycle(int clockCycle) {
+    // Loop over addStations
+    	
+	    for (int i = 0; i < addStations.size(); i++) {
+	        ReservationStation station = addStations.get(i);
+	        Integer time = station.getTime();
+	        if (time != null) {
+	        	if(time == 6) {table.setExecutionStart(i, clockCycle);}
+	            // Subtract 1 from time
+	            time = time - 1;
+	            station.setTime(time);
+	            if (time == 0) {
+	            	table.setExecutionEnd(i, clockCycle);
+	            	
+	            	regFile.resetRow(Integer.parseInt(addStations.getStation(i).getA().substring(1))-1);
+	            	addStations.getStation(i).reset(); // Reset the station before removal (if needed)
+	                // Time has reached zero, perform necessary actions (empty for now)
+	            }
+	        }
+	    }
+	
+	    // Loop over mulStations
+	    for (int i = 0; i < mulStations.size(); i++) {
+	        ReservationStation station = mulStations.get(i);
+	        Integer time = station.getTime();
+	        if (time != null) {
+	        	if(time == 2) {table.setExecutionStart(i, clockCycle);}
+	            // Subtract 1 from time
+	            time = time - 1;
+	            station.setTime(time);
+	            if (time == 0) {
+	            	table.setExecutionEnd(i, clockCycle);
+	            	List<Point> l= regFile.get(Integer.parseInt(mulStations.get(i).getA().substring(1))-1).getList();
+	            	for(Point p:l) {
+	            		System.out.println(p);
+	            		if(p.getY().equals("qj"))
+	            			addStations.setStationJ(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
+	            		if(p.getY().equals("qK"))
+	            			addStations.setStationK(p.getX(), regFile.get(Integer.parseInt(p.getZ().substring(1))-1).getName());
+	            	}
+	            	regFile.resetRow(Integer.parseInt(mulStations.getStation(i).getA().substring(1))-1);
+	                mulStations.getStation(i).reset(); // Reset the station before removal (if needed)
+	                // Time has reached zero, perform necessary actions (empty for now)
+	            }
+	        }
+	    }
+}
+
+
 
     // Main method
     public static void main(String[] args) {

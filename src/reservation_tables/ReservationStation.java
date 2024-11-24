@@ -126,6 +126,16 @@ public class ReservationStation {
         this.a = a;
         this.Time = Time;
     }
+    public void setAll(String op, String vj, String vk, String qj, String qk) {
+        this.op = op;
+        this.vj = vj;
+        this.vk = vk;
+        this.qj = qj;
+        this.qk = qk;
+    }
+    public void setTime(Integer i) {
+    	this.Time =i;
+    }
 
     @Override
     public String toString() {
@@ -140,4 +150,17 @@ public class ReservationStation {
                ", a='" + a + '\'' +
                '}';
     }
+
+	public Integer getTime() {
+		return Time;
+	}
+
+	public void setJ(String vj) {
+		this.vj = vj;
+		this.qj = null;
+	}
+	public void setK(String vk) {
+		this.vk = vk;
+		this.qk = null;
+	}
 }
